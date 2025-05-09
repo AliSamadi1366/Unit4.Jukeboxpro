@@ -14,12 +14,13 @@ export async function createPlaylist(name, description, userId) {
   return playlist;
 }
 
-export async function getPlaylists() {
+export async function getPlaylistsByUserId(id) {
   const sql = `
   SELECT *
   FROM playlists
+  WHERE user_id = $1
   `;
-  const { rows: playlists } = await db.query(sql);
+  const { rows: playlists } = await db.query(sql, [id]);
   return playlists;
 }
 
@@ -33,4 +34,16 @@ export async function getPlaylistById(id) {
     rows: [playlist],
   } = await db.query(sql, [id]);
   return playlist;
+}
+export async function getPlaylistByTrackId(trackId , userId) {
+  const sql = `
+  SELECT playlists.*
+  FROM 
+    playlists_tracks
+    JOIN playlists ON playlists_tracks.playlist_id = playlists.id
+  WHERE
+    playlists_tracks.track_id = $1
+    AND playlists.user_id = $2`;
+    const { rows : playlists } = await db.query(sql, [trackId, userId]);
+    return playlists;
 }
